@@ -1,3 +1,8 @@
+-- ╔════════════════════════════════════════════╗
+-- ║     MLML673 HUB - COMBINED SCRIPT         ║
+-- ║  Speed Booster + FPS Devour + AP Spammer  ║
+-- ╚════════════════════════════════════════════╝
+
 -- ========== SERVICES ==========
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -9,6 +14,7 @@ local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Backpack = LocalPlayer:WaitForChild("Backpack")
+local UIS = UserInputService
 
 -- ========== CLEANUP EXISTING UI ==========
 local existingUI = PlayerGui:FindFirstChild("CombinedUI")
@@ -187,6 +193,85 @@ FPSButton.MouseButton1Click:Connect(function()
     end
 end)
 
+-- ========== SPEED BOOSTER FRAME ==========
+local SpeedFrame = Instance.new("Frame", ScreenGui)
+SpeedFrame.Name = "SpeedFrame"
+SpeedFrame.Size = UDim2.fromOffset(80, 80)
+SpeedFrame.Position = UDim2.fromScale(0.92, 0.45)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SpeedFrame.BorderSizePixel = 0
+Instance.new("UICorner", SpeedFrame).CornerRadius = UDim.new(0, 12)
+
+local SpeedButton = Instance.new("TextButton", SpeedFrame)
+SpeedButton.Name = "SpeedButton"
+SpeedButton.Size = UDim2.fromOffset(70, 70)
+SpeedButton.Position = UDim2.fromOffset(5, 5)
+SpeedButton.Text = "SPD\n28.8"
+SpeedButton.Font = Enum.Font.GothamBold
+SpeedButton.TextSize = 14
+SpeedButton.TextColor3 = Color3.new(1, 1, 1)
+SpeedButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedButton.AutoButtonColor = false
+SpeedButton.BorderSizePixel = 0
+Instance.new("UICorner", SpeedButton).CornerRadius = UDim.new(0, 10)
+
+-- Speed Booster Variables
+getgenv().EDITFLEXX_SPEED = getgenv().EDITFLEXX_SPEED or 28.8
+local SPEED = getgenv().EDITFLEXX_SPEED
+local speedEnabled = false
+local speedConn
+
+local function getChar()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    return char, char:WaitForChild("HumanoidRootPart"), char:WaitForChild("Humanoid")
+end
+
+local function startSpeed()
+    if speedConn then return end
+    speedConn = RunService.Heartbeat:Connect(function()
+        local _, hrp, hum = getChar()
+        local dir = hum.MoveDirection
+        if dir.Magnitude > 0 then
+            hrp.AssemblyLinearVelocity = Vector3.new(dir.X * SPEED, hrp.AssemblyLinearVelocity.Y, dir.Z * SPEED)
+        end
+    end)
+end
+
+local function stopSpeed()
+    if speedConn then speedConn:Disconnect() speedConn = nil end
+end
+
+-- Speed Booster Dragging
+local sdragging, sdragStart, sstartPos
+SpeedFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        sdragging = true
+        sdragStart = input.Position
+        sstartPos = SpeedFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then sdragging = false end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if sdragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - sdragStart
+        SpeedFrame.Position = UDim2.new(sstartPos.X.Scale, sstartPos.X.Offset + delta.X, sstartPos.Y.Scale, sstartPos.Y.Offset + delta.Y)
+    end
+end)
+
+SpeedButton.Activated:Connect(function()
+    speedEnabled = not speedEnabled
+    if speedEnabled then
+        startSpeed()
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+    else
+        stopSpeed()
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end
+end)
+
 -- ========== AP SPAMMER FRAME ==========
 local SpammerFrame = Instance.new("Frame")
 SpammerFrame.Name = "APSpammerFrame"
@@ -250,159 +335,6 @@ Scroll.Parent = SpammerFrame
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Padding = UDim.new(0, 4)
 UIListLayout.Parent = Scroll
-
--- ========== SPEED BOOSTER FRAME ==========
-local BoosterFrame = Instance.new("Frame")
-BoosterFrame.Name = "SpeedBoosterFrame"
-BoosterFrame.Size = UDim2.new(0, 180, 0, 100)
-BoosterFrame.Position = UDim2.new(0, 20, 0, 20)
-BoosterFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-BoosterFrame.BackgroundTransparency = 0.2
-BoosterFrame.BorderSizePixel = 0
-BoosterFrame.Parent = ScreenGui
-
-local BoosterCorner = Instance.new("UICorner", BoosterFrame)
-BoosterCorner.CornerRadius = UDim.new(0, 8)
-
--- Gradient effect
-local UIGradient = Instance.new("UIGradient", BoosterFrame)
-UIGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(40, 40, 40)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-})
-UIGradient.Rotation = 45
-
--- Animated white stroke
-local Stroke = Instance.new("UIStroke", BoosterFrame)
-Stroke.Color = Color3.new(1, 1, 1)
-Stroke.Thickness = 2
-Stroke.Transparency = 0.3
-
--- Animate the stroke
-RunService.Heartbeat:Connect(function()
-    UIGradient.Offset = Vector2.new((tick() % 2) - 1, 0)
-end)
-
--- Title
-local BoosterTitle = Instance.new("TextLabel")
-BoosterTitle.Size = UDim2.new(1, -20, 0, 20)
-BoosterTitle.Position = UDim2.new(0, 10, 0, 8)
-BoosterTitle.BackgroundTransparency = 1
-BoosterTitle.Text = "MLML673 HUB"
-BoosterTitle.TextColor3 = Color3.new(1, 0, 0)
-BoosterTitle.Font = Enum.Font.GothamBold
-BoosterTitle.TextSize = 14
-BoosterTitle.TextXAlignment = Enum.TextXAlignment.Left
-BoosterTitle.Parent = BoosterFrame
-
--- Speed Row
-local SpeedLabel = Instance.new("TextLabel")
-SpeedLabel.Size = UDim2.new(0, 50, 0, 20)
-SpeedLabel.Position = UDim2.new(0, 10, 0, 40)
-SpeedLabel.BackgroundTransparency = 1
-SpeedLabel.Text = "SPEED:"
-SpeedLabel.TextColor3 = Color3.new(1, 1, 1)
-SpeedLabel.Font = Enum.Font.Gotham
-SpeedLabel.TextSize = 12
-SpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
-SpeedLabel.Parent = BoosterFrame
-
-local SpeedBox = Instance.new("TextBox")
-SpeedBox.Name = "SpeedBox"
-SpeedBox.Size = UDim2.new(0, 60, 0, 22)
-SpeedBox.Position = UDim2.new(0, 65, 0, 39)
-SpeedBox.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-SpeedBox.Text = "22.5"
-SpeedBox.TextColor3 = Color3.new(1, 0, 0)
-SpeedBox.Font = Enum.Font.Gotham
-SpeedBox.TextSize = 12
-SpeedBox.ClearTextOnFocus = false
-SpeedBox.Parent = BoosterFrame
-
-local SpeedBoxCorner = Instance.new("UICorner", SpeedBox)
-SpeedBoxCorner.CornerRadius = UDim.new(0, 4)
-
-local SpeedBoxStroke = Instance.new("UIStroke", SpeedBox)
-SpeedBoxStroke.Color = Color3.new(1, 0, 0)
-SpeedBoxStroke.Thickness = 1
-
--- Jump Row
-local JumpLabel = Instance.new("TextLabel")
-JumpLabel.Size = UDim2.new(0, 50, 0, 20)
-JumpLabel.Position = UDim2.new(0, 10, 0, 65)
-JumpLabel.BackgroundTransparency = 1
-JumpLabel.Text = "JUMP:"
-JumpLabel.TextColor3 = Color3.new(1, 1, 1)
-JumpLabel.Font = Enum.Font.Gotham
-JumpLabel.TextSize = 12
-JumpLabel.TextXAlignment = Enum.TextXAlignment.Left
-JumpLabel.Parent = BoosterFrame
-
-local JumpBox = Instance.new("TextBox")
-JumpBox.Name = "JumpBox"
-JumpBox.Size = UDim2.new(0, 60, 0, 22)
-JumpBox.Position = UDim2.new(0, 65, 0, 64)
-JumpBox.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-JumpBox.Text = "35"
-JumpBox.TextColor3 = Color3.new(1, 0, 0)
-JumpBox.Font = Enum.Font.Gotham
-JumpBox.TextSize = 12
-JumpBox.ClearTextOnFocus = false
-JumpBox.Parent = BoosterFrame
-
-local JumpBoxCorner = Instance.new("UICorner", JumpBox)
-JumpBoxCorner.CornerRadius = UDim.new(0, 4)
-
-local JumpBoxStroke = Instance.new("UIStroke", JumpBox)
-JumpBoxStroke.Color = Color3.new(1, 0, 0)
-JumpBoxStroke.Thickness = 1
-
--- Toggle Button
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Name = "ToggleBooster"
-ToggleButton.Size = UDim2.new(0, 40, 0, 16)
-ToggleButton.Position = UDim2.new(1, -50, 0, 8)
-ToggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-ToggleButton.Text = ""
-ToggleButton.AutoButtonColor = false
-ToggleButton.Parent = BoosterFrame
-
-local ToggleCorner = Instance.new("UICorner", ToggleButton)
-ToggleCorner.CornerRadius = UDim.new(0, 8)
-
--- Toggle Background
-local ToggleBackground = Instance.new("Frame", ToggleButton)
-ToggleBackground.Size = UDim2.new(1, 0, 1, 0)
-ToggleBackground.BackgroundColor3 = Color3.new(0.8, 0, 0)
-ToggleBackground.BackgroundTransparency = 0.3
-ToggleBackground.ZIndex = 0
-Instance.new("UICorner", ToggleBackground).CornerRadius = UDim.new(0, 8)
-
--- Toggle Knob
-local Knob = Instance.new("Frame", ToggleButton)
-Knob.Name = "ToggleKnob"
-Knob.Size = UDim2.new(0, 12, 0, 12)
-Knob.Position = UDim2.new(0, 2, 0.5, 0)
-Knob.AnchorPoint = Vector2.new(0, 0.5)
-Knob.BackgroundColor3 = Color3.new(1, 1, 1)
-Knob.ZIndex = 2
-Knob.Parent = ToggleButton
-
-local KnobCorner = Instance.new("UICorner", Knob)
-KnobCorner.CornerRadius = UDim.new(0, 6)
-
--- Status indicator
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(0, 40, 0, 12)
-StatusLabel.Position = UDim2.new(1, -50, 0, 26)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "OFF"
-StatusLabel.TextColor3 = Color3.new(1, 0, 0)
-StatusLabel.Font = Enum.Font.GothamBold
-StatusLabel.TextSize = 10
-StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
-StatusLabel.Parent = BoosterFrame
 
 -- ========== ESP FRAME ==========
 local ESPFrame = Instance.new("Frame")
@@ -479,6 +411,136 @@ ESPStatusLabel.Font = Enum.Font.GothamBold
 ESPStatusLabel.TextSize = 10
 ESPStatusLabel.TextXAlignment = Enum.TextXAlignment.Center
 ESPStatusLabel.Parent = ESPFrame
+
+-- ========== SPEED BOOSTER FRAME (ADDITIONAL UI) ==========
+local BoosterFrame = Instance.new("Frame")
+BoosterFrame.Name = "BoosterFrame"
+BoosterFrame.Size = UDim2.new(0, 200, 0, 140)
+BoosterFrame.Position = UDim2.new(0, 20, 0, 20)
+BoosterFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+BoosterFrame.BackgroundTransparency = 0.2
+BoosterFrame.BorderSizePixel = 0
+BoosterFrame.Parent = ScreenGui
+
+local BoosterCorner = Instance.new("UICorner", BoosterFrame)
+BoosterCorner.CornerRadius = UDim.new(0, 8)
+
+local Stroke = Instance.new("UIStroke", BoosterFrame)
+Stroke.Color = Color3.new(0, 1, 0)
+Stroke.Thickness = 2
+Stroke.Transparency = 0.3
+
+-- Booster Title
+local BoosterTitle = Instance.new("TextLabel")
+BoosterTitle.Size = UDim2.new(1, -20, 0, 20)
+BoosterTitle.Position = UDim2.new(0, 10, 0, 5)
+BoosterTitle.BackgroundTransparency = 1
+BoosterTitle.Text = "Speed Booster"
+BoosterTitle.TextColor3 = Color3.new(0, 1, 0)
+BoosterTitle.Font = Enum.Font.GothamBold
+BoosterTitle.TextSize = 14
+BoosterTitle.TextXAlignment = Enum.TextXAlignment.Left
+BoosterTitle.Parent = BoosterFrame
+
+-- Speed Value Box
+local SpeedBoxLabel = Instance.new("TextLabel")
+SpeedBoxLabel.Size = UDim2.new(0, 60, 0, 15)
+SpeedBoxLabel.Position = UDim2.new(0, 10, 0, 30)
+SpeedBoxLabel.BackgroundTransparency = 1
+SpeedBoxLabel.Text = "Speed:"
+SpeedBoxLabel.TextColor3 = Color3.new(1, 1, 1)
+SpeedBoxLabel.Font = Enum.Font.Gotham
+SpeedBoxLabel.TextSize = 12
+SpeedBoxLabel.Parent = BoosterFrame
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Size = UDim2.new(0, 80, 0, 20)
+SpeedBox.Position = UDim2.new(0, 75, 0, 28)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedBox.TextColor3 = Color3.new(1, 1, 1)
+SpeedBox.Text = "28.8"
+SpeedBox.Font = Enum.Font.Gotham
+SpeedBox.TextSize = 12
+SpeedBox.Parent = BoosterFrame
+
+local SpeedBoxStroke = Instance.new("UIStroke", SpeedBox)
+SpeedBoxStroke.Color = Color3.new(1, 0, 0)
+SpeedBoxStroke.Thickness = 2
+
+Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
+
+-- Jump Value Box
+local JumpBoxLabel = Instance.new("TextLabel")
+JumpBoxLabel.Size = UDim2.new(0, 60, 0, 15)
+JumpBoxLabel.Position = UDim2.new(0, 10, 0, 55)
+JumpBoxLabel.BackgroundTransparency = 1
+JumpBoxLabel.Text = "Jump:"
+JumpBoxLabel.TextColor3 = Color3.new(1, 1, 1)
+JumpBoxLabel.Font = Enum.Font.Gotham
+JumpBoxLabel.TextSize = 12
+JumpBoxLabel.Parent = BoosterFrame
+
+local JumpBox = Instance.new("TextBox")
+JumpBox.Size = UDim2.new(0, 80, 0, 20)
+JumpBox.Position = UDim2.new(0, 75, 0, 53)
+JumpBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+JumpBox.TextColor3 = Color3.new(1, 1, 1)
+JumpBox.Text = "35"
+JumpBox.Font = Enum.Font.Gotham
+JumpBox.TextSize = 12
+JumpBox.Parent = BoosterFrame
+
+local JumpBoxStroke = Instance.new("UIStroke", JumpBox)
+JumpBoxStroke.Color = Color3.new(1, 0, 0)
+JumpBoxStroke.Thickness = 2
+
+Instance.new("UICorner", JumpBox).CornerRadius = UDim.new(0, 6)
+
+-- Toggle Button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "BoosterToggle"
+ToggleButton.Size = UDim2.new(0, 40, 0, 16)
+ToggleButton.Position = UDim2.new(1, -50, 0, 8)
+ToggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+ToggleButton.Text = ""
+ToggleButton.AutoButtonColor = false
+ToggleButton.Parent = BoosterFrame
+
+local ToggleCorner = Instance.new("UICorner", ToggleButton)
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+
+-- Toggle Background
+local ToggleBackground = Instance.new("Frame", ToggleButton)
+ToggleBackground.Size = UDim2.new(1, 0, 1, 0)
+ToggleBackground.BackgroundColor3 = Color3.new(0.8, 0, 0)
+ToggleBackground.BackgroundTransparency = 0.3
+ToggleBackground.ZIndex = 0
+Instance.new("UICorner", ToggleBackground).CornerRadius = UDim.new(0, 8)
+
+-- Toggle Knob
+local Knob = Instance.new("Frame", ToggleButton)
+Knob.Name = "ToggleKnob"
+Knob.Size = UDim2.new(0, 12, 0, 12)
+Knob.Position = UDim2.new(0, 2, 0.5, 0)
+Knob.AnchorPoint = Vector2.new(0, 0.5)
+Knob.BackgroundColor3 = Color3.new(1, 1, 1)
+Knob.ZIndex = 2
+Knob.Parent = ToggleButton
+
+local KnobCorner = Instance.new("UICorner", Knob)
+KnobCorner.CornerRadius = UDim.new(0, 6)
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(0, 40, 0, 12)
+StatusLabel.Position = UDim2.new(1, -50, 0, 26)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "OFF"
+StatusLabel.TextColor3 = Color3.new(1, 0, 0)
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 10
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
+StatusLabel.Parent = BoosterFrame
 
 -- ========== DRAGGING FUNCTIONALITY ==========
 local draggingSpammer = false
@@ -912,4 +974,5 @@ if Plots then
     end)
 end
 
-print("✅ Combined script loaded successfully!")
+print("✅ MLML673 HUB - Combined script loaded successfully!")
+print("📦 Features: Speed Booster + FPS Devour + AP Spammer + ESP System")
